@@ -2,7 +2,7 @@
   "name": "@dims/bulk-style-swap",
   "private": true,
   "version": "0.0.1",
-  "description": "A Figma plugin to swap color and text styles in bulk.",
+  "description": "A Figma plugin to swap styles in bulk.",
   "scripts": {
     "test": "npm run tsc && npm run build",
     "format": "prettier --write .",
