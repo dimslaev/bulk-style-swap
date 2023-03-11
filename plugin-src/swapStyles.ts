@@ -1,33 +1,11 @@
-import { StyleSwapMap, GenericStyle } from "./types";
-import { debug } from "./utils";
-
-const styleGetter = {
-  PAINT: figma.getLocalPaintStyles,
-  TEXT: figma.getLocalTextStyles,
-  EFFECT: figma.getLocalEffectStyles,
-  GRID: figma.getLocalGridStyles,
-};
-
-const styleIdGetter = {
-  PAINT: "fillStyleId",
-  TEXT: "textStyleId",
-  EFFECT: "effectStyleId",
-  GRID: "gridStyleId",
-};
-
-const getStyleByName = (styles: GenericStyle[], name: string) => {
-  return styles.find((it) => it.name === name);
-};
-
-const getChildrenWithStyleId = (
-  parent: any,
-  styleType: StyleType,
-  styleId: string
-) => {
-  return parent.findAll((node: any) => {
-    return node[styleIdGetter[styleType]] === styleId;
-  });
-};
+import { StyleSwapMap } from "./types";
+import {
+  debug,
+  styleGetter,
+  styleIdGetter,
+  getStyleByName,
+  getChildrenWithStyleId,
+} from "./utils";
 
 export const swapStyles = (
   target: any,

@@ -137,7 +137,7 @@ function App() {
         </button>
 
         <button className="button button--primary" onClick={onSwapStyles}>
-          Swap styles from page / selection
+          Swap styles on page / selection
         </button>
       </div>
     </div>

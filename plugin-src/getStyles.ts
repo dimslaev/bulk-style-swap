@@ -1,12 +1,4 @@
-import { StyleSwapMap, GenericStyle } from "./types";
-import { debug } from "./utils";
-
-const styleIdGetter = {
-  PAINT: "fillStyleId",
-  TEXT: "textStyleId",
-  EFFECT: "effectStyleId",
-  GRID: "gridStyleId",
-};
+import { debug, styleIdGetter } from "./utils";
 
 export const getStyles = (target: any, styleType: StyleType) => {
   const styleIdProp = styleIdGetter[styleType];
