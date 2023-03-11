@@ -23,11 +23,27 @@ figma.ui.onmessage = async ({
 }) => {
   debug("action", action, "type", type, "value", value);
 
-  await loadFonts();
-
   const target = figma.currentPage.selection[0] || figma.currentPage;
 
   debug("target", target);
+
+  if (
+    [
+      "DOCUMENT",
+      "PAGE",
+      "FRAME",
+      "GROUP",
+      "COMPONENT",
+      "COMPONENT_SET",
+    ].indexOf(target.type) === -1
+  ) {
+    figma.notify(
+      "Please click to select the entire page or specific group, frame, component set..."
+    );
+    return;
+  }
+
+  await loadFonts();
 
   if (action === "get") {
     getStyles(target, type);
