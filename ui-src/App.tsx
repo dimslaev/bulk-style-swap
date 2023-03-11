@@ -63,11 +63,24 @@ function App() {
     setSelectedStyleType(event.target.value);
   };
 
-  const onSubmit = () => {
+  const onGetStyles = () => {
     parent.postMessage(
       {
         pluginMessage: {
           type: selectedStyleType,
+          action: "get",
+        },
+      },
+      "*"
+    );
+  };
+
+  const onSwapStyles = () => {
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: selectedStyleType,
+          action: "swap",
           value: inputRef.current?.value,
         },
       },
@@ -76,11 +89,11 @@ function App() {
   };
 
   React.useEffect(() => {
-    window.onmessage = (event) => {
-      console.log(
-        event.data.pluginMessage.type,
-        event.data.pluginMessage.value
-      );
+    window.onmessage = (e) => {
+      if (!inputRef.current) return;
+      if (e.data.pluginMessage.type === "result") {
+        inputRef.current.value = e.data.pluginMessage.value;
+      }
     };
   }, []);
 
@@ -118,9 +131,15 @@ function App() {
         ></textarea>
       </section>
 
-      <button className="button button--primary" onClick={onSubmit}>
-        Swap styles
-      </button>
+      <div className="actions">
+        <button className="button button--secondary" onClick={onGetStyles}>
+          Get styles from page / selection
+        </button>
+
+        <button className="button button--primary" onClick={onSwapStyles}>
+          Swap styles from page / selection
+        </button>
+      </div>
     </div>
   );
 }

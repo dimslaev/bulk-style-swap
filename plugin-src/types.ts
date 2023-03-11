@@ -3,3 +3,4 @@ export type StyleSwapMap = {
 };
 export type GenericStyle = PaintStyle | TextStyle | EffectStyle | GridStyle;
 export type FigmaStyleType = StyleType;
+export type PluginMessageAction = "get" | "swap";

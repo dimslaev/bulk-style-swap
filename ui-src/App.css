@@ -9,3 +9,11 @@
 .radio-group {
   display: flex;
 }
+
+.actions {
+  display: flex;
+}
+
+.actions .button + .button {
+  margin-left: 8px;
+}

@@ -1,6 +1,8 @@
 import { debug } from "./utils";
 import { getParsedValue } from "./utils";
 import { swapStyles } from "./swapStyles";
+import { getStyles } from "./getStyles";
+import { PluginMessageAction } from "./types";
 
 figma.showUI(__html__, { height: 420, width: 500 });
 
@@ -11,13 +13,15 @@ async function loadFonts() {
 }
 
 figma.ui.onmessage = async ({
+  action,
   type,
   value,
 }: {
+  action: PluginMessageAction;
   type: StyleType;
-  value: string;
+  value?: string;
 }) => {
-  debug("type", type, "value", value);
+  debug("action", action, "type", type, "value", value);
 
   await loadFonts();
 
@@ -25,12 +29,18 @@ figma.ui.onmessage = async ({
 
   debug("target", target);
 
-  const parsedValue = getParsedValue(value);
-
-  if (!parsedValue) {
-    figma.notify("Invalid value");
-    return;
+  if (action === "get") {
+    getStyles(target, type);
   }
 
-  swapStyles(target, parsedValue, type);
+  if (action === "swap") {
+    const parsedValue = getParsedValue(value);
+
+    if (!parsedValue) {
+      figma.notify("Invalid value");
+      return;
+    }
+
+    swapStyles(target, parsedValue, type);
+  }
 };
