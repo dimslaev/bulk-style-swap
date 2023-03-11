@@ -1,38 +1,8 @@
 import React from "react";
 import "figma-plugin-ds/dist/figma-plugin-ds.css";
 import "./App.css";
-import { FigmaStyleType } from "../plugin-src/types";
-
-function RadioInput({
-  name,
-  value,
-  defaultValue,
-  label,
-  onChange,
-}: {
-  name: string;
-  value: string;
-  defaultValue: string;
-  label: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}) {
-  return (
-    <div className="radio">
-      <input
-        className="radio__button"
-        type="radio"
-        name={name}
-        value={value}
-        id={value}
-        onChange={onChange}
-        defaultChecked={value === defaultValue}
-      />
-      <label className="radio__label" htmlFor={value}>
-        {label}
-      </label>
-    </div>
-  );
-}
+import { PluginMessageAction } from "../plugin-src/types";
+import { RadioInput } from "./RadioInput";
 
 const radioInputs = [
   {
@@ -57,32 +27,16 @@ function App() {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
   const [selectedStyleType, setSelectedStyleType] =
-    React.useState<FigmaStyleType>("PAINT");
+    React.useState<StyleType>("PAINT");
 
   const onStyleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedStyleType(event.target.value);
+    setSelectedStyleType(event.target.value as StyleType);
   };
 
-  const onGetStyles = () => {
+  const postMessage = (type: StyleType, action: PluginMessageAction) => {
     parent.postMessage(
       {
-        pluginMessage: {
-          type: selectedStyleType,
-          action: "get",
-        },
-      },
-      "*"
-    );
-  };
-
-  const onSwapStyles = () => {
-    parent.postMessage(
-      {
-        pluginMessage: {
-          type: selectedStyleType,
-          action: "swap",
-          value: inputRef.current?.value,
-        },
+        pluginMessage: { type, action },
       },
       "*"
     );
@@ -132,11 +86,21 @@ function App() {
       </section>
 
       <div className="actions">
-        <button className="button button--secondary" onClick={onGetStyles}>
+        <button
+          className="button button--secondary"
+          onClick={() => {
+            postMessage(selectedStyleType, "get");
+          }}
+        >
           Get styles from page / selection
         </button>
 
-        <button className="button button--primary" onClick={onSwapStyles}>
+        <button
+          className="button button--primary"
+          onClick={() => {
+            postMessage(selectedStyleType, "swap");
+          }}
+        >
           Swap styles on page / selection
         </button>
       </div>
