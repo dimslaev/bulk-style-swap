@@ -33,10 +33,14 @@ function App() {
     setSelectedStyleType(event.target.value as StyleType);
   };
 
-  const postMessage = (type: StyleType, action: PluginMessageAction) => {
+  const postMessage = (
+    action: PluginMessageAction,
+    type: StyleType,
+    value?: string
+  ) => {
     parent.postMessage(
       {
-        pluginMessage: { type, action },
+        pluginMessage: { action, type, value },
       },
       "*"
     );
@@ -89,7 +93,7 @@ function App() {
         <button
           className="button button--secondary"
           onClick={() => {
-            postMessage(selectedStyleType, "get");
+            postMessage("get", selectedStyleType);
           }}
         >
           Get styles from page / selection
@@ -98,7 +102,7 @@ function App() {
         <button
           className="button button--primary"
           onClick={() => {
-            postMessage(selectedStyleType, "swap");
+            postMessage("swap", selectedStyleType, inputRef.current?.value);
           }}
         >
           Swap styles on page / selection
