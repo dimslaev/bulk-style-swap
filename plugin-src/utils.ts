@@ -22,22 +22,23 @@ export const styleGetter = {
 };
 
 export const styleIdGetter = {
-  PAINT: "fillStyleId",
-  TEXT: "textStyleId",
-  EFFECT: "effectStyleId",
-  GRID: "gridStyleId",
+  PAINT: ["fillStyleId", "strokeStyleId"],
+  TEXT: ["textStyleId"],
+  EFFECT: ["effectStyleId"],
+  GRID: ["gridStyleId"],
 };
 
 export const getStyleByName = (styles: GenericStyle[], name: string) => {
   return styles.find((it) => it.name === name);
 };
 
-export const getChildrenWithStyleId = (
+export const getChildrenWithStyle = (
   parent: any,
   styleType: StyleType,
-  styleId: string
+  style: GenericStyle
 ) => {
+  const styleIdKeys = styleIdGetter[styleType];
   return parent.findAll((node: any) => {
-    return node[styleIdGetter[styleType]] === styleId;
+    return styleIdKeys.some((key) => node[key] === style.id);
   });
 };

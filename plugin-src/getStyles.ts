@@ -1,27 +1,30 @@
+import { GenericStyle } from "./types";
 import { debug, styleIdGetter } from "./utils";
 
 export const getStyles = (target: any, styleType: StyleType) => {
-  const styleIdProp = styleIdGetter[styleType];
+  const styleIdKeys = styleIdGetter[styleType];
 
-  debug(styleIdProp);
+  debug("styleIdKeys", styleIdKeys);
 
-  const targetStyleNames = target
-    .findAll((node: any) => !!node[styleIdProp])
-    .map((node: any) => {
-      return figma.getStyleById(node[styleIdProp])?.name;
+  const styles: BaseStyle[] = [];
+
+  target.findAll((node: any) => {
+    styleIdKeys.forEach((key) => {
+      if (node[key]) {
+        const style = figma.getStyleById(node[key]);
+        if (style) styles.push(style);
+      }
     });
+  });
 
-  debug(targetStyleNames);
+  debug("styles", styles);
 
-  const result = targetStyleNames.reduce(
-    (acc: any, curr: string | undefined) => {
-      if (curr) acc[curr] = "";
-      return acc;
-    },
-    {}
-  );
+  const result = styles.reduce((acc: any, curr: BaseStyle) => {
+    if (curr) acc[curr.name] = "";
+    return acc;
+  }, {});
 
-  debug(result);
+  debug("result", result);
 
   figma.ui.postMessage({
     type: "result",

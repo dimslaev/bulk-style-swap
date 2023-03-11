@@ -4,7 +4,7 @@ import {
   styleGetter,
   styleIdGetter,
   getStyleByName,
-  getChildrenWithStyleId,
+  getChildrenWithStyle,
 } from "./utils";
 
 export const swapStyles = (
@@ -13,6 +13,7 @@ export const swapStyles = (
   styleType: StyleType
 ) => {
   const styles = styleGetter[styleType]();
+  const styleIdKeys = styleIdGetter[styleType];
   const missingStyles: string[] = [];
 
   let totalUpdates = 0;
@@ -37,18 +38,25 @@ export const swapStyles = (
 
     debug("newStyle", newStyle);
 
-    const nodesToBeUpdated = getChildrenWithStyleId(
-      target,
-      styleType,
-      oldStyle.id
-    );
+    const nodesToBeUpdated = getChildrenWithStyle(target, styleType, oldStyle);
 
     debug("nodesToBeUpdated", nodesToBeUpdated);
 
     totalUpdates += nodesToBeUpdated.length;
 
     nodesToBeUpdated.forEach((node: any) => {
-      node[styleIdGetter[styleType]] = newStyle.id;
+      if (styleType === "PAINT") {
+        if (node.fillStyleId === oldStyle.id) {
+          node.fillStyleId = newStyle.id;
+        }
+        if (node.strokeStyleId === oldStyle.id) {
+          node.strokeStyleId = newStyle.id;
+        }
+      } else {
+        styleIdKeys.forEach((key) => {
+          node[key] = newStyle.id;
+        });
+      }
     });
   });
 
