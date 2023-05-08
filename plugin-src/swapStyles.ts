@@ -71,6 +71,7 @@ export const swapStyles = (
 
   if (needsProPermission) {
     figma.notify("Swaping styles from external libraries is a PRO feature");
+    figma.ui.postMessage({ type: "needsPro" });
   }
 
   if (totalUpdates === 0) {
@@ -80,8 +81,8 @@ export const swapStyles = (
 
   if (missingStyles.length) {
     figma.notify("Some style were not found: " + missingStyles.join(", "));
-    return;
   }
 
   figma.notify(`Updated ${totalUpdates} node${totalUpdates > 1 ? "s" : ""}`);
+  figma.ui.postMessage({ type: "usage", totalUpdates });
 };

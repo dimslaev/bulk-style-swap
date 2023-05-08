@@ -3,6 +3,7 @@ import "figma-plugin-ds/dist/figma-plugin-ds.css";
 import "./App.css";
 import { PluginMessageAction } from "../plugin-src/types";
 import { RadioInput } from "./RadioInput";
+import * as mixpanel from "mixpanel-figma";
 
 const radioInputs = [
   {
@@ -26,7 +27,7 @@ const radioInputs = [
 function App() {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
-  const [pro, setPro] = React.useState(true);
+  const pro = false; // For now all users are pro
 
   const [selectedStyleType, setSelectedStyleType] =
     React.useState<StyleType>("PAINT");
@@ -38,7 +39,7 @@ function App() {
   const postMessage = (
     pro: boolean,
     action: PluginMessageAction,
-    type: StyleType,
+    type?: StyleType,
     value?: string
   ) => {
     parent.postMessage(
@@ -50,10 +51,28 @@ function App() {
   };
 
   React.useEffect(() => {
+    mixpanel.init("1f41c90b6061fd7cef3ad6cd7ced17b0", {
+      debug: true,
+    });
+
+    postMessage(pro, "getUser");
+  }, []);
+
+  React.useEffect(() => {
     window.onmessage = (e) => {
       if (!inputRef.current) return;
-      if (e.data.pluginMessage.type === "result") {
-        inputRef.current.value = e.data.pluginMessage.value;
+      const { type, value } = e.data.pluginMessage;
+      if (type === "result") {
+        inputRef.current.value = value;
+      }
+      if (type === "user") {
+        mixpanel.identify(value);
+      }
+      if (type === "needsPro") {
+        mixpanel.track("needsPro");
+      }
+      if (type === "usage") {
+        mixpanel.track("usage");
       }
     };
   }, []);
@@ -96,7 +115,7 @@ function App() {
         <button
           className="button button--secondary"
           onClick={() => {
-            postMessage(pro, "get", selectedStyleType);
+            postMessage(pro, "getStyles", selectedStyleType);
           }}
         >
           Get styles from page / selection
@@ -107,7 +126,7 @@ function App() {
           onClick={() => {
             postMessage(
               pro,
-              "swap",
+              "swapStyles",
               selectedStyleType,
               inputRef.current?.value
             );

@@ -1,5 +1,5 @@
 import { debug } from "./utils";
-import { getParsedValue } from "./utils";
+import { getParsedValue, getUser } from "./utils";
 import { swapStyles } from "./swapStyles";
 import { getStyles } from "./getStyles";
 import { PluginMessageAction, SelectionNode } from "./types";
@@ -19,11 +19,21 @@ figma.ui.onmessage = async ({
   pro,
 }: {
   action: PluginMessageAction;
-  type: StyleType;
+  type?: StyleType;
   value?: string;
   pro: boolean;
 }) => {
   debug("action", action, "type", type, "value", value);
+
+  if (action === "getUser") {
+    getUser().then((userId) => {
+      figma.ui.postMessage({
+        type: "user",
+        value: userId,
+      });
+    });
+    return;
+  }
 
   const selection = figma.currentPage.selection[0] || figma.currentPage;
 
@@ -47,11 +57,11 @@ figma.ui.onmessage = async ({
 
   await loadFonts();
 
-  if (action === "get") {
+  if (action === "getStyles" && type) {
     getStyles(selection, type);
   }
 
-  if (action === "swap") {
+  if (action === "swapStyles" && type) {
     const parsedValue = getParsedValue(value);
 
     if (!parsedValue) {

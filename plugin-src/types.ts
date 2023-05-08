@@ -1,7 +1,7 @@
 export type StyleSwapMap = {
   [key: string]: string;
 };
-export type PluginMessageAction = "get" | "swap";
+export type PluginMessageAction = "getStyles" | "swapStyles" | "getUser";
 export type SelectionNode =
   | DocumentNode
   | PageNode
