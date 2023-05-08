@@ -27,7 +27,7 @@ const radioInputs = [
 function App() {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
-  const pro = false; // For now all users are pro
+  const pro = true; // For now all users are pro
 
   const [selectedStyleType, setSelectedStyleType] =
     React.useState<StyleType>("PAINT");
