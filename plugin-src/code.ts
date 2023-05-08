@@ -2,7 +2,7 @@ import { debug } from "./utils";
 import { getParsedValue } from "./utils";
 import { swapStyles } from "./swapStyles";
 import { getStyles } from "./getStyles";
-import { PluginMessageAction } from "./types";
+import { PluginMessageAction, SelectionNode } from "./types";
 
 figma.showUI(__html__, { height: 420, width: 500 });
 
@@ -16,16 +16,18 @@ figma.ui.onmessage = async ({
   action,
   type,
   value,
+  pro,
 }: {
   action: PluginMessageAction;
   type: StyleType;
   value?: string;
+  pro: boolean;
 }) => {
   debug("action", action, "type", type, "value", value);
 
-  const target = figma.currentPage.selection[0] || figma.currentPage;
+  const selection = figma.currentPage.selection[0] || figma.currentPage;
 
-  debug("target", target);
+  debug("selection", selection);
 
   if (
     [
@@ -35,7 +37,7 @@ figma.ui.onmessage = async ({
       "GROUP",
       "COMPONENT",
       "COMPONENT_SET",
-    ].indexOf(target.type) === -1
+    ].indexOf(selection.type) === -1
   ) {
     figma.notify(
       "Please click to select the entire page or specific group, frame, component set..."
@@ -46,7 +48,7 @@ figma.ui.onmessage = async ({
   await loadFonts();
 
   if (action === "get") {
-    getStyles(target, type);
+    getStyles(selection, type);
   }
 
   if (action === "swap") {
@@ -57,6 +59,6 @@ figma.ui.onmessage = async ({
       return;
     }
 
-    swapStyles(target, parsedValue, type);
+    swapStyles(selection as SelectionNode, parsedValue, type, pro);
   }
 };

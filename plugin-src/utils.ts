@@ -1,4 +1,4 @@
-import { GenericStyle } from "./types";
+import { SelectionNode } from "./types";
 
 export const debug = (...msg: any) => {
   // @ts-ignore
@@ -28,17 +28,42 @@ export const styleIdGetter = {
   GRID: ["gridStyleId"],
 };
 
-export const getStyleByName = (styles: GenericStyle[], name: string) => {
+export const getStyleByName = (styles: BaseStyle[], name: string) => {
   return styles.find((it) => it.name === name);
 };
 
-export const getChildrenWithStyle = (
-  parent: any,
-  styleType: StyleType,
-  style: GenericStyle
+export const getSelectionStyles = (
+  selection: SelectionNode,
+  styleType: StyleType
 ) => {
   const styleIdKeys = styleIdGetter[styleType];
-  return parent.findAll((node: any) => {
+
+  debug("styleIdKeys", styleIdKeys);
+
+  const styles: BaseStyle[] = [];
+
+  selection.findAll((node: any) => {
+    styleIdKeys.forEach((key) => {
+      if (node[key]) {
+        const style = figma.getStyleById(node[key]);
+        if (style) styles.push(style);
+      }
+    });
+    return false;
+  });
+
+  return styles;
+};
+
+export const getStyleConsumers = (
+  selection: SelectionNode,
+  styleType: StyleType,
+  style: BaseStyle
+) => {
+  const styleIdKeys = styleIdGetter[styleType];
+  return selection.findAll((node: any) => {
     return styleIdKeys.some((key) => node[key] === style.id);
   });
 };
+
+export const X_FIGMA_TOKEN = "figd_4a6YcRqh2EMV27lW6Snu1XSB47x69WjhVQ4I49Bf";

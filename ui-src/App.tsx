@@ -26,6 +26,8 @@ const radioInputs = [
 function App() {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
+  const [pro, setPro] = React.useState(true);
+
   const [selectedStyleType, setSelectedStyleType] =
     React.useState<StyleType>("PAINT");
 
@@ -34,13 +36,14 @@ function App() {
   };
 
   const postMessage = (
+    pro: boolean,
     action: PluginMessageAction,
     type: StyleType,
     value?: string
   ) => {
     parent.postMessage(
       {
-        pluginMessage: { action, type, value },
+        pluginMessage: { pro, action, type, value },
       },
       "*"
     );
@@ -93,7 +96,7 @@ function App() {
         <button
           className="button button--secondary"
           onClick={() => {
-            postMessage("get", selectedStyleType);
+            postMessage(pro, "get", selectedStyleType);
           }}
         >
           Get styles from page / selection
@@ -102,7 +105,12 @@ function App() {
         <button
           className="button button--primary"
           onClick={() => {
-            postMessage("swap", selectedStyleType, inputRef.current?.value);
+            postMessage(
+              pro,
+              "swap",
+              selectedStyleType,
+              inputRef.current?.value
+            );
           }}
         >
           Swap styles on page / selection

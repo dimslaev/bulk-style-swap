@@ -1,35 +1,44 @@
-import { StyleSwapMap } from "./types";
+import { StyleSwapMap, SelectionNode } from "./types";
 import {
   debug,
   styleGetter,
   styleIdGetter,
   getStyleByName,
-  getChildrenWithStyle,
+  getSelectionStyles,
+  getStyleConsumers,
 } from "./utils";
 
 export const swapStyles = (
-  target: any,
+  selection: SelectionNode,
   styleSwapMap: StyleSwapMap,
-  styleType: StyleType
+  styleType: StyleType,
+  pro: boolean
 ) => {
-  const styles = styleGetter[styleType]();
+  const localStyles = styleGetter[styleType]();
+  const selectionStyles = getSelectionStyles(selection, styleType);
   const styleIdKeys = styleIdGetter[styleType];
   const missingStyles: string[] = [];
 
+  let needsProPermission = false;
   let totalUpdates = 0;
 
   Object.keys(styleSwapMap).forEach((oldStyleName) => {
-    const oldStyle = getStyleByName(styles, oldStyleName);
+    const oldStyle = getStyleByName(selectionStyles, oldStyleName);
 
     if (!oldStyle) {
       missingStyles.push(oldStyleName);
       return;
     }
 
+    if (oldStyle.remote && !pro) {
+      needsProPermission = true;
+      return;
+    }
+
     debug("oldStyle", oldStyle);
 
     const newStyleName = styleSwapMap[oldStyleName];
-    const newStyle = getStyleByName(styles, newStyleName);
+    const newStyle = getStyleByName(localStyles, newStyleName);
 
     if (!newStyle) {
       missingStyles.push(newStyleName);
@@ -38,7 +47,7 @@ export const swapStyles = (
 
     debug("newStyle", newStyle);
 
-    const nodesToBeUpdated = getChildrenWithStyle(target, styleType, oldStyle);
+    const nodesToBeUpdated = getStyleConsumers(selection, styleType, oldStyle);
 
     debug("nodesToBeUpdated", nodesToBeUpdated);
 
@@ -60,6 +69,10 @@ export const swapStyles = (
     });
   });
 
+  if (needsProPermission) {
+    figma.notify("Swaping styles from external libraries is a PRO feature");
+  }
+
   if (totalUpdates === 0) {
     figma.notify("Nothing to update");
     return;
@@ -67,5 +80,8 @@ export const swapStyles = (
 
   if (missingStyles.length) {
     figma.notify("Some style were not found: " + missingStyles.join(", "));
+    return;
   }
+
+  figma.notify(`Updated ${totalUpdates} node${totalUpdates > 1 ? "s" : ""}`);
 };

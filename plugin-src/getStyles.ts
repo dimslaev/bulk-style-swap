@@ -1,27 +1,18 @@
-import { GenericStyle } from "./types";
-import { debug, styleIdGetter } from "./utils";
+import { debug, styleIdGetter, getSelectionStyles } from "./utils";
+import { StyleSwapMap } from "./types";
 
-export const getStyles = (target: any, styleType: StyleType) => {
+export const getStyles = (selection: any, styleType: StyleType) => {
   const styleIdKeys = styleIdGetter[styleType];
 
   debug("styleIdKeys", styleIdKeys);
 
-  const styles: BaseStyle[] = [];
-
-  target.findAll((node: any) => {
-    styleIdKeys.forEach((key) => {
-      if (node[key]) {
-        const style = figma.getStyleById(node[key]);
-        if (style) styles.push(style);
-      }
-    });
-  });
+  const styles: BaseStyle[] = getSelectionStyles(selection, styleType);
 
   debug("styles", styles);
 
-  const result = styles.reduce((acc: any, curr: BaseStyle) => {
-    if (curr) acc[curr.name] = "";
-    return acc;
+  const result = styles.reduce((obj: StyleSwapMap, style: BaseStyle) => {
+    if (style) obj[style.name] = `new/${style.name}`;
+    return obj;
   }, {});
 
   debug("result", result);
